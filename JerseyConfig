@@ -1,0 +1,39 @@
+package com.scb.channels.research.config;
+
+import com.scb.channels.foundation.api.resource.filters.CORSResponseFilter;
+import com.scb.channels.foundation.api.resource.filters.CacheControlFilter;
+import com.scb.channels.research.error.RpExceptionMapper;
+import com.scb.channels.research.resource.*;
+import org.glassfish.jersey.logging.LoggingFeature;
+import org.glassfish.jersey.server.ResourceConfig;
+import org.springframework.context.annotation.Configuration;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+@Configuration
+public class JerseyConfig extends ResourceConfig {
+
+    public JerseyConfig() {
+        register(CORSResponseFilter.class);
+        register(CacheControlFilter.class);
+        register(CollateralResourceImpl.class);
+        register(UserResourceImpl.class);
+        register(DeviceRegistrationResourceImpl.class);
+        register(RpExceptionMapper.class);
+        register(ServiceContextResourceImpl.class);
+        register(UserReconResourceImpl.class);
+        register(HealthCheckResourceImpl.class);
+        register(NotificationResourceImpl.class);
+        registerJerseyLogger();
+    }
+
+    private void registerJerseyLogger() {
+        String loggingCategory = LoggingFeature.class.getCanonicalName();
+        register(new LoggingFeature(Logger.getLogger(loggingCategory),
+                Level.INFO,
+                LoggingFeature.Verbosity.PAYLOAD_TEXT,
+                null));
+    }
+}
+
