@@ -1,0 +1,20 @@
+package com.scb.channels.research.config;
+
+
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
+
+@Component
+public class RestProxyTemplate {
+
+
+    private RestTemplate restTemplate;
+
+    public RestProxyTemplate(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
+
+    public RestTemplate getRestTemplate() {
+        return restTemplate;
+    }
+}
