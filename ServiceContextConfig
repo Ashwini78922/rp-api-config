@@ -1,0 +1,72 @@
+package com.scb.channels.research.config;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+
+@Configuration
+public class ServiceContextConfig {
+
+    private boolean transactionSuccess;
+
+    private String plexId = "";
+
+    private String groupId = "";
+
+    private String userId = "";
+
+    private String profileId = "";
+
+    private String uiVersion = "";
+
+    private int idleTimeout;
+
+    private int asbsoluteTimeout;
+
+    private String language = "";
+
+    private String appAccessType = "";
+
+
+    public boolean isTransactionSuccess() {
+        return transactionSuccess;
+    }
+
+    public String getPlexId() {
+        return plexId;
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public String getProfileId() {
+        return profileId;
+    }
+
+    public String getUiVersion() {
+        return uiVersion;
+    }
+
+    public int getIdleTimeout() {
+        return idleTimeout;
+    }
+
+    public int getAsbsoluteTimeout() {
+        return asbsoluteTimeout;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public String getAppAccessType() {
+        return appAccessType;
+    }
+
+}
