@@ -1,0 +1,64 @@
+package com.scb.channels.research.config;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpException;
+import org.apache.http.HttpHost;
+import org.apache.http.HttpRequest;
+import org.apache.http.conn.routing.HttpRoute;
+import org.apache.http.conn.routing.HttpRoutePlanner;
+import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
+import org.apache.http.protocol.HttpContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
+import static com.scb.channels.research.utils.RpApiConstants.HOST_INDEX;
+import static com.scb.channels.research.utils.RpApiConstants.PORT_INDEX;
+
+
+public class DynamicProxyRoutePlanner implements HttpRoutePlanner {
+
+    private final Map<String, DefaultProxyRoutePlanner> proxyRoutePlannerMap;
+    private static final Logger LOG = LoggerFactory.getLogger(DynamicProxyRoutePlanner.class);
+    private static final int TIME_OUT_IN_MILL_SEC = 1000;
+
+    public DynamicProxyRoutePlanner(Map<String, DefaultProxyRoutePlanner> proxyRoutePlannerMap) {
+        this.proxyRoutePlannerMap = null != proxyRoutePlannerMap ? proxyRoutePlannerMap : new HashMap<>();
+    }
+
+    public HttpRoute determineRoute(HttpHost target, HttpRequest request, HttpContext context) throws HttpException {
+        return select().determineRoute(target, request, context);
+    }
+
+    public DefaultProxyRoutePlanner select() {
+        Optional<DefaultProxyRoutePlanner> defaultProxyRoutePlanner = proxyRoutePlannerMap.keySet().stream()
+                .filter(this::isAvailable).map(proxyRoutePlannerMap::get).findFirst();
+        if (defaultProxyRoutePlanner.isPresent()) {
+            return defaultProxyRoutePlanner.get();
+        }
+        throw new RuntimeException("No Proxies available ");
+    }
+
+    private boolean isAvailable(String proxy) {
+        try (Socket socket = new Socket()) {
+            socket.connect(
+                    new InetSocketAddress(
+                            StringUtils.split(proxy, ':')[HOST_INDEX],
+                            Integer.valueOf(StringUtils.split(proxy, ':')[PORT_INDEX])
+                    ),
+                    TIME_OUT_IN_MILL_SEC
+            );
+            LOG.info("Proxy[{}] is selected to process the request", proxy);
+            return socket.isConnected();
+        } catch (IOException e) {
+            LOG.warn("Proxy " + proxy + "is unavailable : ", e);
+            return false;
+        }
+    }
+}
